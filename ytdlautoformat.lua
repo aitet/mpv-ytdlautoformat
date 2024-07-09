@@ -21,28 +21,18 @@ end
 
 -- Domains list for custom quality
 local StreamSource = Set {
-	'youtu.be', 'youtube.com', 'www.youtube.com', 
+	'youtu.be', 'youtube.com', 'www.youtube.com',
 	'twitch.tv', 'www.twitch.tv'
 }
 
--- Accepts: 240, 360, 480, 720, 1080, 1440, 2160, 4320
-local changedQuality = 480
-
--- Affects matched and non-matched domains
-local enableVP9 = false
-
 -- Do not edit from here on
 local msg = require 'mp.msg'
-local utils = require 'mp.utils'
 
-local VP9value = ""
+local ytdlChange = "[vcodec^=?avc1]"
+local ytdlDefault = "bestvideo+bestaudio/best"
 
-if enableVP9 == false then
-	VP9value = "[vcodec!=?vp9]"
-end
-
-local ytdlChange = "bv[height<=?"..changedQuality.."]"..VP9value.."+ba/b[height<="..changedQuality.."]"
-local ytdlDefault = "bv"..VP9value.."+ba/b"
+local ytdlChanged = false
+local oldpath = mp.get_property("path", "")
 
 local function getStreamSource(path)
 	local hostname = path:match '^%a+://([^/]+)/' or ''
@@ -50,32 +40,27 @@ local function getStreamSource(path)
 end
 
 local function ytdlAutoChange(name, value)
-	local path = value
-
-	if StreamSource[getStreamSource(string.lower(path))] then
+	if StreamSource[getStreamSource(string.lower(value))] then
 		mp.set_property("ytdl-format", ytdlChange)
-		msg.info("Domain match found, ytdl-format has been changed.")
-		msg.info("Changed ytdl-format: "..mp.get_property("ytdl-format"))
-	else
-		msg.info("No domain match, ytdl-format unchanged.")
+		msg.info("Domain match found, Changed ytdl-format: "..mp.get_property("ytdl-format"))
 	end
-
 	mp.unobserve_property(ytdlAutoChange)
-	msg.info("Finished check, script no longer running.")
 end
 
 local function ytdlCheck()
-	local path = mp.get_property("path", "")
-	
-	if string.match(string.lower(path), "^(%a+://)") then
+	if string.match(string.lower(oldpath), "^(%a+://)") then
 		mp.set_property("ytdl-format", ytdlDefault)
-		msg.info("Current ytdl-format: "..mp.get_property("ytdl-format"))
-		
+
 		mp.observe_property("path", "string", ytdlAutoChange)
-		msg.info("Observing path to determine ytdlAutoChange status...")
-	else
-		msg.info("Not a URL/Stream, script did not run.")
+		ytdlChanged = true
 	end
 end
 
+local function ytdlRevert(event)
+	if ytdlChanged and event.reason == "error"  then
+		mp.ovserve_property("path", "string", oldpath)
+		msg.info("Reverting to: "..oldpath)
+	end
+end
 mp.register_event("start-file", ytdlCheck)
+mp.register_event("end-file", ytdlRevert)
