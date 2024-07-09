@@ -1,24 +1,19 @@
 # mpv-ytdlautoformat
-A simple mpv script to automatically change `ytdl-format`, for Youtube and Twitch by default, but more domains can be added as desired.
+A simple mpv script to automatically change `ytdl-format`, for Youtube by default, but more domains can be added as desired.
 
 This script supports and works with multi-purpose playlists. For example, if you have a playlist that includes Youtube URLs, Vimeo URLs and local files.
 
-If the URL is Youtube or Twitch, `ytdl-format` is set to: 480p, 30 FPS and no VP9 codec (By default, can be changed).
+If the URL is Youtube, `ytdl-format` is set to: avc1 codec (By default, can be changed).
 
-Otherwise, `ytdl-format` is set to: Best video quality, 30 FPS and no VP9 codec.
+Otherwise, `ytdl-format` is set to: Best video quality.
 
 # Options
 If you would like to add more domains to have `ytdl-format` automatiaclly changed for them, simply add them to the `StreamSource` set.
 
-To adjust quality of matched domains, edit `changedQuality` value.
-
-Affects matched and non-matched domains:
-- To enable VP9 codec, change `enableVP9` to `true`.
+To adjust quality of matched domains, edit `ytdlChange` value.
 
 # How is this script useful?
-Some streaming websites do not offer multi-quality per video. So if you have `ytdl-format` in `mpv.conf` set to only play 480p or 720p videos, mpv/yt-dlp will not run it because it cannot find a video with the specified format.
-
-This script helps you set a lower or a specific quality for some websites, while leaving the rest as default. That way all video streams will play and you won't have to keep editing `mpv.conf` each time to make it work.
+Youtube limits the download speed of every other codec then AVC1.
 
 # Changes to mpv configuration made by the script
 The script will override any `ytdl-format` you have set in `mpv.conf` or in commandline to the values you have set within the script.

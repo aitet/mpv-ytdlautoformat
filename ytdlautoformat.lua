@@ -1,12 +1,11 @@
 --[[
 
 A simple mpv script to automatically change ytdl-format (yt-dlp)
-specifically if the URL is Youtube or Twitch, by default.
+specifically if the URL is Youtube, by default.
 
 Options:
 - To add more domains, simply add them to the StreamSource set.
-- To adjust quality, edit changedQuality value.
-- To enable VP9 codec, change enableVP9 to true.
+- To adjust quality, edit ytdlChange value.
 
 For more details:
 https://github.com/Samillion/mpv-ytdlautoformat
